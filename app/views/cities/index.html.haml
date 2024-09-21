@@ -1,0 +1,71 @@
+.py-12
+  .flex.justify-center
+    = form_with url: cities_path, method: :get do |f|
+      .grid.grid-cols-1.gap-6
+        %label.block
+          %span.text-gray-700
+            Latitude
+          = f.number_field :lat,
+            value: params[:lat],
+            id: 'form-latitude',
+            step: :any,
+            placeholder: '48.67915',
+            class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
+
+        %label.block
+          %span.text-gray-700
+            Longitude
+          = f.number_field :lon,
+            value: params[:lon],
+            id: 'form-longitude',
+            step: :any,
+            placeholder: '7.51224',
+            class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
+
+        %label.block
+          %span.text-gray-700
+            Radius (Kms)
+          = f.number_field :radius,
+            value: params[:radius],
+            id: 'form-radius',
+            placeholder: '300',
+            class: 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50'
+
+        = f.submit 'Submit',
+          id: 'form-submit',
+          class: 'justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+
+- if @cities.any?
+  .py-12
+    .mt-8
+      .cities
+        .grid.grid-cols-3.gap-6
+          - @cities.each do |city|
+            .city.max-w-xs.mx-auto.overflow-hidden.bg-white.rounded-lg.shadow-lg.dark:bg-gray-800
+              = image_tag Faker::LoremFlickr.image(size: "500x500", search_terms: city.keywords), class: "object-cover w-full h-56"
+              .py-5.text-center
+                %span.capital.block.text-2xl.font-bold.text-gray-800.dark:text-white
+                  = city.capital
+                %span.country.block.text-sm.text-gray-700.dark:text-gray-200
+                  = city.country
+                %span.kilometers.block.text-sm.text-gray-400.dark:text-gray-200
+                  = number_with_precision(city.distance, precision: 2)
+                  kms
+
+
+:javascript
+  $(document).ready(function() {
+    if(navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(position => {
+        var lat = $('#form-latitude')
+        if (!lat.val()) {
+          lat.val(position.coords.latitude);
+        }
+
+        var lon = $('#form-longitude')
+        if (!lon.val()) {
+          lon.val(position.coords.longitude);
+        }
+      });
+    }
+  })
